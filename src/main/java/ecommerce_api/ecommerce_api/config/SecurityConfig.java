@@ -19,7 +19,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity //스프링 시큐리티 활성화
 public class SecurityConfig {
 
   /*  @Bean
@@ -35,8 +35,6 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-    // ✅ 이게 없어서 에러가 난 겁니다
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
