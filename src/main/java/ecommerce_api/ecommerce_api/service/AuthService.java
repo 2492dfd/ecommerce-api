@@ -31,18 +31,31 @@ public class AuthService {
 
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
-        if (userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        try {
+            System.out.println(">>> [AuthService.signUp] START - Attempting to sign up user: " + signUpRequest.getEmail());
+
+            if (userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
+                System.out.println(">>> [AuthService.signUp] FAILED - Email already exists: " + signUpRequest.getEmail());
+                throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            }
+            System.out.println(">>> [AuthService.signUp] PASSED - Email check successful.");
+
+            User user = User.builder()
+                    .email(signUpRequest.getEmail())
+                    .password(passwordEncoder.encode(signUpRequest.getPassword())) // 비밀번호 암호화
+                    .name(signUpRequest.getName())
+                    .provider("local") // 일반 회원가입
+                    .build();
+            System.out.println(">>> [AuthService.signUp] CREATED - User object: " + user.toString());
+
+            userRepository.save(user);
+
+            System.out.println(">>> [AuthService.signUp] SUCCESS - User saved to database.");
+        } catch (Exception e) {
+            System.out.println(">>> [AuthService.signUp] EXCEPTION - An error occurred: " + e.getMessage());
+            // Re-throw the exception to ensure the transaction rolls back and the client gets an error response.
+            throw e;
         }
-
-        User user = User.builder()
-                .email(signUpRequest.getEmail())
-                .password(passwordEncoder.encode(signUpRequest.getPassword())) // 비밀번호 암호화
-                .name(signUpRequest.getName())
-                .provider("local") // 일반 회원가입
-                .build();
-
-        userRepository.save(user);
     }
 
     @Transactional(readOnly = true)

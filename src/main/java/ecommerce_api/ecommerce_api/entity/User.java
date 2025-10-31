@@ -6,10 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity //jpa가 이 클래스 테이블로 관리
 @Setter
 @Getter
 @NoArgsConstructor
+@ToString // ToString 추가
 //db 모델
 public class User  {
     @Id
@@ -23,6 +29,13 @@ public class User  {
     private String name;
     @Column(nullable = false)
     private String provider; //local로 회원가입 했는지 google로 회원가입 했는지
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Wishlist> wishlist = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecentlyViewed> recentlyViewed = new ArrayList<>();
+
     @Builder
     public User(String email, String password, String name, String provider) {
         this.email = email;
